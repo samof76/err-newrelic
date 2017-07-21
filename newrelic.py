@@ -62,6 +62,6 @@ class Newrelic(BotPlugin):
         image_file = "/tmp/{0}".format(image_name)
 
         image = export_png(plot, filename=image_file)
-        #self.send_stream_request(msg.frm, open(image, 'r'), name=, stream_type='application/')
-
+        stream = self.send_stream_request(msg.frm, open(image, 'r'), name=image_name, stream_type='image/png')
+        
         return "Genrated graph successfully {0}".format(image)
