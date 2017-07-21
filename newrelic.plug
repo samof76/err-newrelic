@@ -1,0 +1,9 @@
+[Core]
+Name = Newrelic
+Module = newrelic
+
+[Documentation]
+Description = This is Newrelic plugin to get graphs
+
+[Python]
+Version = 3
