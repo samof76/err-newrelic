@@ -34,7 +34,7 @@ class Newrelic(BotPlugin):
     def get_configuration_template(self):
         return CONFIG_TEMPLATE
 
-    def create_plot(self,token,app_id,metric_name):
+    def create_response_time_plot(self,token,app_id,metric_name,type):
         hd = Applications(token).metric_data(app_id,[metric_name],['average_response_time'])
         x = []
         y = []
@@ -43,11 +43,25 @@ class Newrelic(BotPlugin):
             x.append(arrow.get(timeslice['to']).to('local').time())
             y.append(timeslice['values']['average_response_time'])
 
-        p = figure(title="Response Time of App", plot_width=800, plot_height=400, x_axis_label='Time', y_axis_label='Avg Response Time', x_axis_type='datetime')
+        p = figure(title="Response Time of {0}".format(type), plot_width=800, plot_height=400, x_axis_label='Time', y_axis_label='Avg Response Time', x_axis_type='datetime')
         p.xaxis.formatter = DatetimeTickFormatter(minutes=["%H:%M"])
         p.line(x, y, legend="Response Time.", line_width=2)
         return p
-        
+    
+    def create_error_rate_plot(self,token,app_id,metric_name,type):
+        hd = Applications(token).metric_data(app_id,[metric_name],['average_response_time'])
+        x = []
+        y = []
+
+        for timeslice in hd['metric_data']['metrics'][0]['timeslices']:
+            x.append(arrow.get(timeslice['to']).to('local').time())
+            y.append(timeslice['values']['err_count'])
+
+        p = figure(title="Error rate of {0}".format(type), plot_width=800, plot_height=400, x_axis_label='Time', y_axis_label='Errors', x_axis_type='datetime')
+        p.xaxis.formatter = DatetimeTickFormatter(minutes=["%H:%M"])
+        p.line(x, y, legend="Response Time.", line_width=2)
+        return p
+
 
     @arg_botcmd('region', type=str)
     def newrelic_get_app_response_time(self, msg, region='us-east-1'):
@@ -59,7 +73,7 @@ class Newrelic(BotPlugin):
         app_id = self.config['app_ids'][region]
         metric_name = 'HttpDispatcher'
     
-        plot = self.create_plot(token, app_id, metric_name)
+        plot = self.create_response_time_plot(token, app_id, metric_name, 'App')
         image_name = "app_reponse_time_{0}.png".format(uuid.uuid4().hex)
         image_file = "/tmp/{0}".format(image_name)
       
@@ -82,8 +96,30 @@ class Newrelic(BotPlugin):
         app_id = self.config['app_ids'][region]
         metric_name = 'Datastore/MySQL/allWeb'
     
-        plot = self.create_plot(token, app_id, metric_name)
-        image_name = "app_reponse_time_{0}.png".format(uuid.uuid4().hex)
+        plot = self.create_response_time_plot(token, app_id, metric_name, 'DB')
+        image_name = "db_reponse_time_{0}.png".format(uuid.uuid4().hex)
+        image_file = "/tmp/{0}".format(image_name)
+      
+        room = msg.frm.room
+        token = self.bot_config.BOT_IDENTITY['token']
+        image = export_png(plot, filename=image_file)
+
+        filepath = image
+        hipchat_file(token, room, filepath, host='api.hipchat.com')
+        return "I hope this helps?"
+
+    @arg_botcmd('region', type=str)
+    def newrelic_get_error_rate(self, msg, region='us-east-1'):
+        """
+        Get response of application for a given region
+        """
+
+        token = self.config['newrelic_token']
+        app_id = self.config['app_ids'][region]
+        metric_name = 'Errors/all'
+    
+        plot = self.create_error_rate_plot(token, app_id, metric_name, 'App')
+        image_name = "app_error_rate_{0}.png".format(uuid.uuid4().hex)
         image_file = "/tmp/{0}".format(image_name)
       
         room = msg.frm.room

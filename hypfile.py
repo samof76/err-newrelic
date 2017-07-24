@@ -53,8 +53,8 @@ def hipchat_file(token, room, filepath, host='api.hipchat.com'):
     r = requests.post(url, data = body, headers = headers)
 
 
-# my_token = '0bh4LzV2E0U94hodZr9qzshNl8sH00IhT3Z2o9dN'
-# my_room = '4040771'
+# my_token = 'XXXXXXXXXXXXX'
+# my_room = 'XXXXXXXXX'
 # my_file = '/tmp/app_reponse_time_01f2f3f10831441e935a88666658092f.png'
 
 # try:
