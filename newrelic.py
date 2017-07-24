@@ -9,6 +9,7 @@ from bokeh.plotting import figure, output_file, show
 from bokeh.io import export_png
 
 import arrow
+from hypfile import hipchat_file
 
 CONFIG_TEMPLATE = {'newrelic_token': '00112233445566778899aabbccddeeff',
                    'app_ids':{
@@ -42,7 +43,7 @@ class Newrelic(BotPlugin):
             x.append(arrow.get(timeslice['to']).to('local').time())
             y.append(timeslice['values']['average_response_time'])
 
-        p = figure(title="simple line example", plot_width=800, plot_height=400, x_axis_label='Time', y_axis_label='Avg Response Time', x_axis_type='datetime')
+        p = figure(title="Response Time of App", plot_width=800, plot_height=400, x_axis_label='Time', y_axis_label='Avg Response Time', x_axis_type='datetime')
         p.xaxis.formatter = DatetimeTickFormatter(minutes=["%H:%M"])
         p.line(x, y, legend="Response Time.", line_width=2)
         return p
@@ -53,6 +54,7 @@ class Newrelic(BotPlugin):
         """
         Get response of application for a given region
         """
+
         token = self.config['newrelic_token']
         app_id = self.config['app_ids'][region]
         metric_name = 'HttpDispatcher'
@@ -60,8 +62,11 @@ class Newrelic(BotPlugin):
         plot = self.create_plot(token, app_id, metric_name)
         image_name = "app_reponse_time_{0}.png".format(uuid.uuid4().hex)
         image_file = "/tmp/{0}".format(image_name)
-
+      
+        room = msg.frm.room
+        token = self.bot_config.BOT_IDENTITY['token']
         image = export_png(plot, filename=image_file)
-        stream = self.send_stream_request(msg.frm, open(image, 'r'), name=image_name, stream_type='image/png')
-        
-        return "Genrated graph successfully {0}".format(image)
+
+        filepath = image
+        hipchat_file(token, room, filepath, host='api.hipchat.com')
+        return "I hope this helps?"
