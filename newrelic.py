@@ -50,7 +50,7 @@ class Newrelic(BotPlugin):
         
 
     @arg_botcmd('region', type=str)
-    def get_app_response_time(self, msg, region='us-east-1'):
+    def newrelic_get_app_response_time(self, msg, region='us-east-1'):
         """
         Get response of application for a given region
         """
@@ -58,6 +58,29 @@ class Newrelic(BotPlugin):
         token = self.config['newrelic_token']
         app_id = self.config['app_ids'][region]
         metric_name = 'HttpDispatcher'
+    
+        plot = self.create_plot(token, app_id, metric_name)
+        image_name = "app_reponse_time_{0}.png".format(uuid.uuid4().hex)
+        image_file = "/tmp/{0}".format(image_name)
+      
+        room = msg.frm.room
+        token = self.bot_config.BOT_IDENTITY['token']
+        image = export_png(plot, filename=image_file)
+
+        filepath = image
+        hipchat_file(token, room, filepath, host='api.hipchat.com')
+        return "I hope this helps?"
+
+
+    @arg_botcmd('region', type=str)
+    def newrelic_get_db_response_time(self, msg, region='us-east-1'):
+        """
+        Get response of application for a given region
+        """
+
+        token = self.config['newrelic_token']
+        app_id = self.config['app_ids'][region]
+        metric_name = 'Datastore/MySQL/allWeb'
     
         plot = self.create_plot(token, app_id, metric_name)
         image_name = "app_reponse_time_{0}.png".format(uuid.uuid4().hex)
