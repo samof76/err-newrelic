@@ -49,13 +49,13 @@ class Newrelic(BotPlugin):
         return p
     
     def create_error_rate_plot(self,token,app_id,metric_name,type):
-        hd = Applications(token).metric_data(app_id,[metric_name],['average_response_time'])
+        hd = Applications(token).metric_data(app_id,[metric_name],['error_count'])
         x = []
         y = []
 
         for timeslice in hd['metric_data']['metrics'][0]['timeslices']:
             x.append(arrow.get(timeslice['to']).to('local').time())
-            y.append(timeslice['values']['err_count'])
+            y.append(timeslice['values']['error_count'])
 
         p = figure(title="Error rate of {0}".format(type), plot_width=800, plot_height=400, x_axis_label='Time', y_axis_label='Errors', x_axis_type='datetime')
         p.xaxis.formatter = DatetimeTickFormatter(minutes=["%H:%M"])
