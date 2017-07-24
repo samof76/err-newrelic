@@ -59,7 +59,7 @@ class Newrelic(BotPlugin):
 
         p = figure(title="Error rate of {0}".format(type), plot_width=800, plot_height=400, x_axis_label='Time', y_axis_label='Errors', x_axis_type='datetime')
         p.xaxis.formatter = DatetimeTickFormatter(minutes=["%H:%M"])
-        p.line(x, y, legend="Response Time.", line_width=2)
+        p.line(x, y, legend="Error Rate.", line_width=2)
         return p
 
 
