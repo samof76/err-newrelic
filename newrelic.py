@@ -24,7 +24,7 @@ def configure(self, configuration):
                             configuration.items()))
     else:
         config = CONFIG_TEMPLATE
-    super(OpsWorks, self).configure(config)
+    super(Newrelic, self).configure(config)
 
 class Newrelic(BotPlugin):
     """
