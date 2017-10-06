@@ -34,7 +34,7 @@ npm install -g phantomjs-prebuilt
 Since the newrelic keys and app ids are a secret, we use partial configuration mechanism to configure Newrelic keys.
 
 ```
-!plugin !plugin config Newrelic {'app_ids':{'us-east-1': 111111111 , 'eu-west-1': 111111111, 'eu-central-1': 11111111}, 'newrelic_token':'1791fc61738c8521876d74'}
+!plugin config Newrelic {'app_ids':{'us-east-1': 111111111 , 'eu-west-1': 111111111, 'eu-central-1': 11111111}, 'newrelic_token':'1791fc61738c8521876d74'}
 ```
 
 > NOTE: `us-east-1` etc., are app ids of that region.
